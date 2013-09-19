@@ -100,6 +100,17 @@ sub run {
     );
 }
 
+sub post_bind_hook {
+    my $self = shift;
+    my $prop = $self->{'server'};
+    # set TCP_DEFER_ACCEPT, only supports linux
+    if ( $^O eq 'linux' ) {
+        foreach my $sock (@{ $prop->{'sock'} }) {
+            setsockopt($sock, IPPROTO_TCP, 9, 1) if $sock->NS_proto eq 'TCP';                
+        }
+    }
+}
+
 sub pre_loop_hook {
     my $self = shift;
 
